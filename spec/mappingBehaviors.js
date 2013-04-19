@@ -45,7 +45,14 @@ test('ko.mapping.toJS should ignore specified single property', function() {
 		b: "b"
 	};
 	
-	var result = ko.mapping.toJS(data, { ignore: "b" });
+	var result = ko.mapping.toJS(data,
+        {
+            b: {
+                __options: {
+                    ignore: true
+                }
+            }
+        });
 	equal(result.a, "a");
 	equal(result.b, undefined);
 });
@@ -61,7 +68,20 @@ test('ko.mapping.toJS should ignore specified single property on update', functi
 	equal(result.a(), "a");
 	equal(result.b(), "b");
 	equal(result.c(), "c");
-	ko.mapping.fromJS({ a: "a2", b: "b2", c: "c2" }, { ignore: ["b", "c"] }, result);
+	ko.mapping.fromJS({ a: "a2", b: "b2", c: "c2" },
+        {
+            b: {
+                __options: {
+                    ignore: true
+                }
+            },
+            c: {
+                __options: {
+                    ignore: true
+                }
+            }
+        },
+        result);
 	equal(result.a(), "a2");
 	equal(result.b(), "b");
 	equal(result.c(), "c");
@@ -73,7 +93,21 @@ test('ko.mapping.toJS should ignore specified multiple properties', function() {
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { ignore: ["a.a1", "b"] });
+	var result = ko.mapping.fromJS(data,
+        {
+            a: {
+                a1: {
+                    __options: {
+                        ignore: true
+                    }
+                }
+            },
+            b: {
+                __options: {
+                    ignore: true
+                }
+            }
+        });
 	equal(result.a.a1, undefined);
 	equal(result.a.a2(), "a2");
 	equal(result.b, undefined);
@@ -92,7 +126,14 @@ test('ko.mapping.fromJS should ignore specified single property', function() {
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { ignore: "b" });
+	var result = ko.mapping.fromJS(data,
+        {
+            b: {
+                __options: {
+                    ignore: true
+                }
+            }
+        });
 	equal(result.a(), "a");
 	equal(result.b, undefined);
 });
@@ -103,7 +144,16 @@ test('ko.mapping.fromJS should ignore specified array item', function() {
 		b: [{ b1: "v1" }, { b2: "v2" }] 
 	};
 	
-	var result = ko.mapping.fromJS(data, { ignore: "b[1].b2" });
+	var result = ko.mapping.fromJS(data,
+        {
+            "b[1]": {
+                b2: {
+                    __options: {
+                        ignore: true
+                    }
+                }
+            }
+        });
 	equal(result.a(), "a");
 	equal(result.b()[0].b1(), "v1");
 	equal(result.b()[1].b2, undefined);
@@ -115,7 +165,14 @@ test('ko.mapping.fromJS should ignore specified single property, also when going
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { ignore: "b" });
+	var result = ko.mapping.fromJS(data,
+        {
+            b: {
+                __options: {
+                    ignore: true
+                }
+            }
+        });
 	var js = ko.mapping.toJS(result);
 	equal(js.a, "a");
 	equal(js.b, undefined);
@@ -127,7 +184,14 @@ test('ko.mapping.fromJS should copy specified single property', function() {
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { copy: "b" });
+	var result = ko.mapping.fromJS(data,
+        {
+            b: {
+                __options: {
+                    copy: true
+                }
+            } 
+        });
 	equal(result.a(), "a");
 	equal(result.b, "b");
 });
@@ -138,7 +202,14 @@ test('ko.mapping.fromJS should copy specified array', function() {
 		b: ["b1", "b2"]
 	};
 	
-	var result = ko.mapping.fromJS(data, { copy: "b" });
+	var result = ko.mapping.fromJS(data,
+        {
+            b: {
+                __options: {
+                    copy: true
+                }
+            }
+        });
 	equal(result.a(), "a");
 	deepEqual(result.b, ["b1", "b2"]);
 });
@@ -149,7 +220,16 @@ test('ko.mapping.fromJS should copy specified array item', function() {
 		b: [{ b1: "v1" }, { b2: "v2" }] 
 	};
 	
-	var result = ko.mapping.fromJS(data, { copy: "b[0].b1" });
+	var result = ko.mapping.fromJS(data,
+        { 
+            "b[0]": {
+                b1: {
+                    __options: {
+                        copy: true
+                    }
+                }
+            } 
+        });
 	equal(result.a(), "a");
 	equal(result.b()[0].b1, "v1");
 	equal(result.b()[1].b2(), "v2");
@@ -161,7 +241,14 @@ test('ko.mapping.fromJS should copy specified single property, also when going b
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { copy: "b" });
+	var result = ko.mapping.fromJS(data,
+        { 
+            b: {
+                __options: {
+                    copy: true
+                }
+            }
+        });
 	var js = ko.mapping.toJS(result);
 	equal(js.a, "a");
 	equal(js.b, "b");
@@ -173,8 +260,22 @@ test('ko.mapping.fromJS should copy specified single property, also when going b
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { copy: "b" });
-	var js = ko.mapping.toJS(result, { ignore: "b" });
+	var result = ko.mapping.fromJS(data,
+        { 
+            b: {
+                __options: {
+                    copy: true
+                }
+            } 
+        });
+	var js = ko.mapping.toJS(result,
+        { 
+            b: {
+                __options: {
+                    ignore: true
+                }
+            } 
+        });
 	equal(js.a, "a");
 	equal(js.b, undefined);
 });
@@ -187,7 +288,14 @@ test('ko.mapping.toJS should include specified single property', function() {
 	var mapped = ko.mapping.fromJS(data);
 	mapped.c = 1;
 	mapped.d = 2;
-	var result = ko.mapping.toJS(mapped, { include: "c" });
+	var result = ko.mapping.toJS(mapped, 
+        { 
+            c: {
+                __options: {
+                    include: true
+                }
+            }
+        });
 	equal(result.a, "a");
 	equal(result.c, 1);
 	equal(result.d, undefined);
@@ -226,7 +334,14 @@ test('ko.mapping.toJS should merge the default includes', function() {
 	var fromJS = ko.mapping.fromJS(data);
 	fromJS.b = "b";
 	fromJS._destroy = true;
-	var result = ko.mapping.toJS(fromJS, { include: "b" });
+	var result = ko.mapping.toJS(fromJS, 
+        { 
+            b: {
+                __options: {
+                    include: true
+                }
+            } 
+        });
 	equal(result.a, "a");
 	equal(result.b, "b");
 	equal(result._destroy, true);
@@ -241,7 +356,14 @@ test('ko.mapping.toJS should merge the default ignores', function() {
 	
 	ko.mapping.defaultOptions().ignore = ["a"];
 	var fromJS = ko.mapping.fromJS(data);
-	var result = ko.mapping.toJS(fromJS, { ignore: "b" });
+	var result = ko.mapping.toJS(fromJS,
+        { 
+            b: {
+                __options: {
+                    ignore: true
+                }
+            } 
+        });
 	equal(result.a, undefined);
 	equal(result.b, undefined);
 	equal(result.c, "c");
@@ -291,22 +413,115 @@ test('recognized root-level options should be moved into a root namespace, leavi
 	
 	// Set up a mapping with root and child mappings
 	var mapping = {
-		ignore: ['a'],
-		copy: ['b'],
-		include: ['c'],
-		create: function(opts) { return opts.data; },
-		update: function(opts) { return opts.data; },
-		key: function(item) { return ko.utils.unwrapObservable(item.id); },
-		arrayChanged: function(event, item) { },
-		children: {
-			ignore: ['a1'],
-			copy: ['b1'],
-			include: ['c1'],
-			create: function(opts) { return opts.data; },
-			update: function(opts) { return opts.data; },
-			key: function(item) { return ko.utils.unwrapObservable(item.id); },
-			arrayChanged: function(event, item) { }
-		}
+        a: {
+            __options: {
+                ignore: true,
+                create: function(opts) { return opts.data; },
+                update: function(opts) { return opts.data; },
+                key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                arrayChanged: function(event, item) { }
+            },
+            a1: {
+                __options: {
+                    ignore: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            },
+            b1: {
+                __options: {
+                    copy: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            },
+            c1: {
+                __options: {
+                    include: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            }
+            
+        },
+        b: {
+            __options: {
+                copy: true,
+                create: function(opts) { return opts.data; },
+                update: function(opts) { return opts.data; },
+                key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                arrayChanged: function(event, item) { }
+            },
+            a1: {
+                __options: {
+                    ignore: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            },
+            b1: {
+                __options: {
+                    copy: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            },
+            c1: {
+                __options: {
+                    include: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            }
+        },
+        c: {
+            __options: {
+                include: true,
+                create: function(opts) { return opts.data; },
+                update: function(opts) { return opts.data; },
+                key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                arrayChanged: function(event, item) { }
+            },
+            a1: {
+                __options: {
+                    ignore: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            },
+            b1: {
+                __options: {
+                    copy: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            },
+            c1: {
+                __options: {
+                    include: true,
+                    create: function(opts) { return opts.data; },
+                    update: function(opts) { return opts.data; },
+                    key: function(item) { return ko.utils.unwrapObservable(item.id); },
+                    arrayChanged: function(event, item) { }
+                }
+            }
+        }
 	};
 	
 	// Run the mapping through ko.mapping.fromJS
@@ -331,7 +546,7 @@ test('ko.mapping.toJS should ignore properties that were not part of the origina
 			b1: 456,
 			b2: [
 				"b21", "b22"
-			],
+			]
 		}
 	};
 	
@@ -356,11 +571,14 @@ test('ko.mapping.toJS should ignore properties that were not part of the origina
 		}
 	];
 	
-	var mapped = ko.mapping.fromJS(data, {
-		create: function(options) {
-			return ko.mapping.fromJS(options.data);
-		}
-	});
+	var mapped = ko.mapping.fromJS(data,
+        {
+            __options: {
+                create: function(options) {
+                    return ko.mapping.fromJS(options.data);
+                }
+            }
+        });
 	mapped.extraProperty = ko.observable(333);
 	mapped.extraFunction = function() {};
 	
@@ -381,17 +599,22 @@ test('ko.mapping.toJS should ignore properties that were not part of the origina
 	
 	var nestedMappingOptions = {
 		a: {
-			create: function(options) {
-				return ko.mapping.fromJS(options.data);
-			}
+            __options: {
+                create: function(options) {
+                    return ko.mapping.fromJS(options.data);
+                }
+            }
 		}
 	};
 	
-	var mapped = ko.mapping.fromJS(data, {
-		create: function(options) {
-			return ko.mapping.fromJS(options.data, nestedMappingOptions);
-		}
-	});
+	var mapped = ko.mapping.fromJS(data,
+        {
+            __options: {
+                create: function(options) {
+                    return ko.mapping.fromJS(options.data, nestedMappingOptions);
+                }
+            }
+	    });
 	mapped.extraProperty = ko.observable(333);
 	mapped.extraFunction = function() {};
 	
@@ -410,7 +633,19 @@ test('ko.mapping.toJS should ignore specified properties', function() {
 		c: "c"
 	};
 	
-	var result = ko.mapping.toJS(data, { ignore: ["b", "c"] });
+	var result = ko.mapping.toJS(data,
+        {
+            b: {
+                __options: {
+                    ignore: true
+                }
+            },
+            c: {
+                __options: {
+                    ignore: true
+                }
+            }
+        });
 	equal(result.a, "a");
 	equal(result.b, undefined);
 	equal(result.c, undefined);
@@ -423,7 +658,19 @@ test('ko.mapping.toJSON should ignore specified properties', function() {
 		c: "c"
 	};
 	
-	var result = ko.mapping.toJSON(data, { ignore: ["b", "c"] });
+	var result = ko.mapping.toJSON(data,
+        {
+            b: {
+                __options: {
+                    ignore: true
+                }
+            },
+            c: {
+                __options: {
+                    ignore: true
+                }
+            }
+        });
 	equal(result, "{\"a\":\"a\"}");
 });
 
@@ -493,9 +740,11 @@ test('ko.mapping.fromJS should return an observableArray if you supply an array,
         var sampleArray = {array: ["a", "b"]};
         var result = ko.mapping.fromJS(sampleArray, {
                 array: {
+                    __options: {
                         create: function(options) {
                                 return new ko.observable(options.data);
                         }
+                    }
                 }
         });
         equal(result.array().length, 2);
@@ -527,10 +776,12 @@ test('ko.mapping.fromJS update callbacks should pass in a non-observable', funct
 		obj: { a: "a" }
 	}, {
 		obj: {
-			update: function(options) {
-				equal(options.observable, undefined);
-				return { b: "b" };
-			}
+            __options: {
+                update: function(options) {
+                    equal(options.observable, undefined);
+                    return { b: "b" };
+                }
+            }
 		}
 	});
 	equal(result.obj.b, "b");
@@ -541,9 +792,11 @@ test('ko.mapping.fromJS update callbacks should pass in an observable, when orig
 		obj: ko.observable("a")
 	}, {
 		obj: {
-			update: function(options) {
-				return options.observable() + "ab";
-			}
+            __options: {
+                update: function(options) {
+                    return options.observable() + "ab";
+                }
+            }
 		}
 	});
 	equal(result.obj(), "aab");
@@ -554,9 +807,11 @@ test('ko.mapping.fromJS update callbacks should pass in an observable, when orig
 		obj: "a"
 	}, {
 		obj: {
-			update: function(options) {
-				return options.observable() + "ab";
-			}
+            __options: {
+                update: function(options) {
+                    return options.observable() + "ab";
+                }
+            }
 		}
 	});
 	equal(result.obj(), "aab");
@@ -593,13 +848,15 @@ test('ko.mapping.fromJS should not map the top-level non-atomic properties on th
 			a2: "a2"
 		}
 	}, {
-		create: function(model) {
-			return {
-				a: {
-					a1: "a1"
-				}
-			};
-		}
+        __options: {
+            create: function(model) {
+                return {
+                    a: {
+                        a1: "a1"
+                    }
+                };
+            }
+        }
 	});
 	equal(ko.isObservable(result.a), false);
 	equal(ko.isObservable(result.a.a1), false);
@@ -613,15 +870,18 @@ test('ko.mapping.fromJS should not map top-level objects on the supplied overrid
 		return this;
 	}
 
-	var result = ko.mapping.fromJS({}, {
-		create: function(model) {
-			return {
-				a: new dummyObject({
-					a1: "Hello"
-				})
-			};
-		}
-	});
+	var result = ko.mapping.fromJS({},
+        {
+            __options: {
+                create: function(model) {
+                    return {
+                        a: new dummyObject({
+                            a1: "Hello"
+                        })
+                    };
+                }
+            }
+        });
 	equal(ko.isObservable(result.a), false);
 	equal(ko.isObservable(result.a.a1), false);
 	equal(result.a.a1, 'Hello');
@@ -637,7 +897,9 @@ test('ko.mapping.fromJS should allow non-unique atomic properties', function () 
 /* speed optimizations don't allow this anymore...
 test('ko.mapping.fromJS should not allow non-unique non-atomic properties', function () {
 	var options = {
-		key: function(item) { return ko.utils.unwrapObservable(item.id); }
+	    __options: {
+		    key: function(item) { return ko.utils.unwrapObservable(item.id); }
+		}
 	};
 
 	var didThrow = false;
@@ -697,10 +959,12 @@ test('ko.mapping.fromJS should send relevant create callbacks', function () {
 	var result = ko.mapping.fromJS({
 		a: "hello"
 	}, {
-		create: function (model) {
-			index++;
-			return model;
-		}
+        __options: {
+            create: function (model) {
+                index++;
+                return model;
+            }
+        }
 	});
 	equal(index, 1);
 });
@@ -711,10 +975,12 @@ test('ko.mapping.fromJS should send relevant create callbacks when mapping array
 	var result = ko.mapping.fromJS([
 		"hello"
 	], {
-		create: function (model) {
-			index++;
-			return model;
-		}
+		__options: {
+            create: function (model) {
+                index++;
+                return model;
+            }
+        }
 	});
 	equal(index, 1);
 });
@@ -727,14 +993,17 @@ test('ko.mapping.fromJS should send parent along to create callback when creatin
 		}
 	};
 	
-	var result = ko.mapping.fromJS(obj, {
-		"b": {
-			create: function(options) {
-				equal(ko.isObservable(options.parent.a), true);
-				equal(options.parent.a(), "a");
-			}
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+		    "b": {
+                __options: {
+                    create: function(options) {
+                        equal(ko.isObservable(options.parent.a), true);
+                        equal(options.parent.a(), "a");
+                    }
+                }
+            }
+        });
 });
 
 test('ko.mapping.fromJS should send parent along to create callback when creating an array item inside an object', function() {
@@ -748,15 +1017,18 @@ test('ko.mapping.fromJS should send parent along to create callback when creatin
 	
 	var target = {};
 	var numCreated = 0;
-	var result = ko.mapping.fromJS(obj, {
-		"b": {
-			create: function(options) {
-				equal(ko.isObservable(options.parent), false);
-				equal(options.parent, target);
-				numCreated++;
-			}
-		}
-	}, target);
+	var result = ko.mapping.fromJS(obj,
+        {
+		    "b": {
+                __options: {
+                    create: function(options) {
+                        equal(ko.isObservable(options.parent), false);
+                        equal(options.parent, target);
+                        numCreated++;
+                    }
+                }
+            }
+	    }, target);
 	
 	equal(numCreated, 2);
 });
@@ -771,21 +1043,26 @@ test('ko.mapping.fromJS should send parent along to create callback when creatin
 	
 	var target = [];
 	var numCreated = 0;
-	var result = ko.mapping.fromJS(obj, {
-		create: function(options) {
-			equal(ko.isObservable(options.parent), true);
-			numCreated++;
-		}
-	}, target);
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                create: function(options) {
+                    equal(ko.isObservable(options.parent), true);
+                    numCreated++;
+                }
+		    }
+        }, target);
 	
 	equal(numCreated, 2);
 });
 
 test('ko.mapping.fromJS should update objects in arrays that were specified in the overriden model in the create callback', function () {
 	var options = {
-		create: function(options) {
-			return ko.mapping.fromJS(options.data);
-		}
+        __options: {
+            create: function(options) {
+                return ko.mapping.fromJS(options.data);
+            }
+        }
 	}
 	
 	var result = ko.mapping.fromJS([], options);
@@ -806,14 +1083,16 @@ test('ko.mapping.fromJS should use the create callback to update objects in arra
 	var arrayEvents = 0;
 	
 	var options = {
-		key: function(item) { return ko.utils.unwrapObservable(item.id); },
-		create: function(options) {
-			created.push(options.data.id);
-			return ko.mapping.fromJS(options.data);
-		},
-		arrayChanged: function(event, item) {
-			arrayEvents++;
-		}
+        __options: {
+            key: function(item) { return ko.utils.unwrapObservable(item.id); },
+            create: function(options) {
+                created.push(options.data.id);
+                return ko.mapping.fromJS(options.data);
+            },
+            arrayChanged: function(event, item) {
+                arrayEvents++;
+            }
+        }
 	}
 	
 	var result = ko.mapping.fromJS([
@@ -835,11 +1114,13 @@ test('ko.mapping.fromJS should use the create callback to update objects in arra
 test('ko.mapping.fromJS should not call the create callback for existing objects', function () {
 	var numCreate = 0;
 	var options = {
-		create: function (model) {
-			numCreate++;
-			var overridenModel = {};
-			return overridenModel;
-		}
+        __options: {
+            create: function (model) {
+                numCreate++;
+                var overridenModel = {};
+                return overridenModel;
+            }
+        }
 	};
 	
 	var items = [];
@@ -874,9 +1155,11 @@ test('ko.mapping.fromJS should send an added callback for every array item that 
 
 	var options = {
 		"a" : {
-			arrayChanged: function (event, newValue) {
-				if (event === "added") added.push(newValue);
-			}
+            __options: {
+                arrayChanged: function (event, newValue) {
+                    if (event === "added") added.push(newValue);
+                }
+            }
 		}
 	};
 	var result = ko.mapping.fromJS({}, options);
@@ -893,9 +1176,11 @@ test('ko.mapping.fromJS should send an added callback for every array item that 
 
 	var options = {
 		"a": {
-			arrayChanged: function (event, newValue) {
-				if (event === "added") added.push(newValue);
-			}
+            __options: {
+                arrayChanged: function (event, newValue) {
+                    if (event === "added") added.push(newValue);
+                }
+            }
 		}
 	};
 	var result = ko.mapping.fromJS({ a: [] }, options);
@@ -924,11 +1209,13 @@ test('ko.mapping.fromJS should not make observable anything that is not in the j
 
 test('ko.mapping.fromJS should not make observable anything that is not in the js object when overriding the model', function () {
 	var options = {
-		create: function(model) {
-			return {
-				a: "a"
-			}
-		}
+        __options: {
+            create: function(model) {
+                return {
+                    a: "a"
+                }
+            }
+        }
 	};
 
 	var result = ko.mapping.fromJS({}, options);
@@ -947,9 +1234,11 @@ test('ko.mapping.fromJS should send an added callback for every array item that 
 
 	var options = {
 		"a": {
-			arrayChanged: function (event, newValue) {
-				if (event === "added") added.push(newValue);
-			}
+            __options: {
+                arrayChanged: function (event, newValue) {
+                    if (event === "added") added.push(newValue);
+                }
+            }
 		}
 	};
 	var result = ko.mapping.fromJS({
@@ -970,9 +1259,11 @@ test('ko.mapping.fromJS should send an added callback for every array item that 
 		a: [1, 2]
 	}, {
 		"a": {
-			arrayChanged: function (event, newValue) {
-				if (event === "added") added.push(newValue);
-			}
+            __options: {
+                arrayChanged: function (event, newValue) {
+                    if (event === "added") added.push(newValue);
+                }
+            }
 		}
 	});
 	equal(added.length, 2);
@@ -1016,10 +1307,12 @@ test('ko.mapping.fromJS should send create callbacks when atomic items are const
 	var callbacksReceived = 0;
 	for (var i = 0; i < atomicValues.length; i++) {
 		var result = ko.mapping.fromJS(atomicValues[i], {
-			create: function (item) {
-				callbacksReceived++;
-				return item;
-			}
+            __options: {
+                create: function (item) {
+                    callbacksReceived++;
+                    return item;
+                }
+            }
 		});
 	}
 	equal(callbacksReceived, 5);
@@ -1041,10 +1334,12 @@ test('ko.mapping.fromJS should send callbacks when atomic array elements are con
 	var items = [];
 	var result = ko.mapping.fromJS(oldItems, {
 		"array": {
-			arrayChanged: function (event, item) {
-				if (event == "added")
-					items.push(item);
-			}
+            __options: {
+                arrayChanged: function (event, item) {
+                    if (event == "added")
+                        items.push(item);
+                }
+            }
 		}
 	});
 	ko.mapping.fromJS(newItems, {}, result);
@@ -1066,9 +1361,12 @@ test('ko.mapping.fromJS should not send callbacks containing parent names when d
 		parents.push(parent);
 		return item;
 	};
-	var result = ko.mapping.fromJS(obj, {
-		create: pushParent
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+		        create: pushParent
+            }
+	    });
 	equal(parents.length, 1);
 	equal(parents[0], undefined);
 });
@@ -1205,12 +1503,14 @@ test('ko.mapping.fromJS should send a callback when adding new objects to an arr
 	var mappedItems = [];
 
 	var options = {
-		key: function(item) {
-			return item.id;
-		},
-		arrayChanged: function (event, item) {
-			if (event == "added") mappedItems.push(item);
-		}
+        __options: {
+            key: function(item) {
+                return item.id;
+            },
+            arrayChanged: function (event, item) {
+                if (event == "added") mappedItems.push(item);
+            }
+        }
 	};
 	var result = ko.mapping.fromJS(obj, options);
 	ko.mapping.fromJS(obj2, {}, result);
@@ -1244,9 +1544,11 @@ test('ko.mapping.fromJS should send a deleted callback when an item was deleted 
 	var items = [];
 
 	var options = {
-		arrayChanged: function (event, item) {
-			if (event == "deleted") items.push(item);
-		}
+        __options: {
+            arrayChanged: function (event, item) {
+                if (event == "deleted") items.push(item);
+            }
+        }
 	};
 	var result = ko.mapping.fromJS(obj, options);
 	ko.mapping.fromJS(obj2, {}, result);
@@ -1256,12 +1558,14 @@ test('ko.mapping.fromJS should send a deleted callback when an item was deleted 
 
 test('ko.mapping.fromJS should reuse options that were added in ko.mapping.fromJS', function() {
 	var viewModelMapping = {
-		key: function(data) {
-			return ko.utils.unwrapObservable(data.id);
-		},
-		create: function(options) {
-			return new viewModel(options);
-		}
+        __options: {
+            key: function(data) {
+                return ko.utils.unwrapObservable(data.id);
+            },
+            create: function(options) {
+                return new viewModel(options);
+            }
+        }
 	};
 	
 	var viewModel = function(options) {
@@ -1328,11 +1632,14 @@ test('observableArray.mappedRemove should use key callback if available', functi
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+        });
 	result.mappedRemove({ id : 2 });
 	equal(result().length, 1);
 });
@@ -1343,11 +1650,14 @@ test('observableArray.mappedRemove with predicate should use key callback if ava
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+	    });
 	result.mappedRemove(function(key) {
 		return key == 2;
 	});
@@ -1360,11 +1670,14 @@ test('observableArray.mappedRemoveAll should use key callback if available', fun
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+        });
 	result.mappedRemoveAll([{ id : 2 }]);
 	equal(result().length, 1);
 });
@@ -1375,11 +1688,14 @@ test('observableArray.mappedDestroy should use key callback if available', funct
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+	    });
 	result.mappedDestroy({ id : 2 });
 	equal(result()[0]._destroy, undefined);
 	equal(result()[1]._destroy, true);
@@ -1391,11 +1707,14 @@ test('observableArray.mappedDestroy with predicate should use key callback if av
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+	    });
 	result.mappedDestroy(function(key) {
 		return key == 2;
 	});
@@ -1409,11 +1728,14 @@ test('observableArray.mappedDestroyAll should use key callback if available', fu
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+	    });
 	result.mappedDestroyAll([{ id : 2 }]);
 	equal(result()[0]._destroy, undefined);
 	equal(result()[1]._destroy, true);
@@ -1425,11 +1747,14 @@ test('observableArray.mappedIndexOf should use key callback if available', funct
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+		    __options: {
+                key: function(item) {
+			        return ko.utils.unwrapObservable(item.id);
+                }
+		    }
+	    });
 	equal(result.mappedIndexOf({ id : 1 }), 0);
 	equal(result.mappedIndexOf({ id : 2 }), 1);
 	equal(result.mappedIndexOf({ id : 3 }), -1);
@@ -1441,11 +1766,14 @@ test('observableArray.mappedCreate should use key callback if available and not 
 		{ id : 2 }
 	]
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		}
-	});		
+	var result = ko.mapping.fromJS(obj,
+        {
+		    __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                }
+            }
+	    });
 	
 	var caught = false;
 	try {
@@ -1470,14 +1798,17 @@ test('observableArray.mappedCreate should use create callback if available', fun
 		this.Hello = ko.observable("hello");
 	}
 	
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		},
-		create: function(options){
-			return new childModel(options.data);
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+		    __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                },
+		        create: function(options){
+			        return new childModel(options.data);
+                }
+            }
+        });
 			
 	result.mappedCreate({ id: 3 });
 	var index = result.mappedIndexOf({ id : 3 });
@@ -1495,19 +1826,22 @@ test('observableArray.mappedCreate should use update callback if available', fun
 		ko.mapping.fromJS(data, {}, this);
 	}
 
-	var result = ko.mapping.fromJS(obj, {
-		key: function(item) {
-			return ko.utils.unwrapObservable(item.id);
-		},
-		create: function(options){
-			return new childModel(options.data);
-		},
-		update: function(options){
-			return {
-				bla: options.data.id * 10
-			};
-		}
-	});
+	var result = ko.mapping.fromJS(obj,
+        {
+            __options: {
+                key: function(item) {
+                    return ko.utils.unwrapObservable(item.id);
+                },
+                create: function(options){
+                    return new childModel(options.data);
+                },
+                update: function(options){
+                    return {
+                        bla: options.data.id * 10
+                    };
+                }
+            }
+	    });
 
 	result.mappedCreate({ id: 3 });
 	equal(result()[0].bla, 10);
@@ -1517,8 +1851,8 @@ test('observableArray.mappedCreate should use update callback if available', fun
 test('ko.mapping.fromJS should merge options from subsequent calls', function() {
 	var obj = ['a'];
 	
-	var result = ko.mapping.fromJS(obj, { dummyOption1: 1 });
-	ko.mapping.fromJS({}, { dummyOption2: 2 }, result);
+	var result = ko.mapping.fromJS(obj, { __options: { dummyOption1: 1 } });
+	ko.mapping.fromJS({}, { __options: { dummyOption2: 2 } }, result);
 	
 	equal(result.__ko_mapping__.dummyOption1, 1);
 	equal(result.__ko_mapping__.dummyOption2, 2);
@@ -1538,10 +1872,12 @@ test('ko.mapping.fromJS should correctly handle falsey values in keys', function
 	var gotDeletedEvent = false;
 	
 	var options = {
-		key: function(item) { return ko.utils.unwrapObservable(item.id); },
-		arrayChanged: function(event, item) {
-			if (event === "deleted") gotDeletedEvent = true;
-		}
+        __options: {
+            key: function(item) { return ko.utils.unwrapObservable(item.id); },
+            arrayChanged: function(event, item) {
+                if (event === "deleted") gotDeletedEvent = true;
+            }
+        }
 	}
 	
 	var result = ko.mapping.fromJS([
@@ -1595,8 +1931,8 @@ test('when doing ko.mapping.fromJS on an already mapped object, the new options 
 test('ko.mapping.fromJS should merge options from subsequent calls', function() {
 	var obj = ['a'];
 	
-	var result = ko.mapping.fromJS(obj, { dummyOption1: 1 });
-	ko.mapping.fromJS(['b'], { dummyOption2: 2 }, result);
+	var result = ko.mapping.fromJS(obj, { __options: { dummyOption1: 1 } });
+	ko.mapping.fromJS(['b'], { __options: { dummyOption2: 2 } }, result);
 	
 	equal(result.__ko_mapping__.dummyOption1, 1);
 	equal(result.__ko_mapping__.dummyOption2, 2);
@@ -1628,8 +1964,8 @@ test('ko.mapping.fromJS should update an array only once', function() {
 test('ko.mapping.fromJSON should merge options from subsequent calls', function() {
 	var obj = ['a'];
 	
-	var result = ko.mapping.fromJS(obj, { dummyOption1: 1 });
-	ko.mapping.fromJSON('["b"]', { dummyOption2: 2 }, result);
+	var result = ko.mapping.fromJS(obj, { __options: { dummyOption1: 1 } });
+	ko.mapping.fromJSON('["b"]', { __options: { dummyOption2: 2 } }, result);
 	
 	equal(result.__ko_mapping__.dummyOption1, 1);
 	equal(result.__ko_mapping__.dummyOption2, 2);
@@ -1702,7 +2038,7 @@ test('ko.mapping.toJS should merge the default observe', function() {
 	};
 	
 	ko.mapping.defaultOptions().observe = ["a"];
-	var result  = ko.mapping.fromJS(data, { observe: "b" });
+	var result  = ko.mapping.fromJS(data, { b: { __options: { observe: true } } });
 	equal(ko.isObservable(result.a), true);
 	equal(ko.isObservable(result.b), true);
 	equal(ko.isObservable(result.c), false);	
@@ -1714,7 +2050,7 @@ test('ko.mapping.fromJS should observe specified single property', function() {
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "a" });
+	var result = ko.mapping.fromJS(data, { a: { __options: { observe: true } } });
 	equal(result.a(), "a");
 	equal(result.b, "b");
 });
@@ -1725,7 +2061,7 @@ test('ko.mapping.fromJS should observe specified array', function() {
 		b: ["b1", "b2"]
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "b" });
+	var result = ko.mapping.fromJS(data, { b: { __options: { observe: true } } });
 	equal(result.a, "a");
 	equal(ko.isObservable(result.b), true);	
 });
@@ -1736,7 +2072,7 @@ test('ko.mapping.fromJS should observe specified array item', function() {
 		b: [{ b1: "v1" }, { b2: "v2" }] 
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "b[0].b1" });
+	var result = ko.mapping.fromJS(data, { "b[0]": { b1: { __options: { observe: true } } } });
 	equal(result.a, "a");
 	equal(result.b[0].b1(), "v1");
 	equal(result.b[1].b2, "v2");
@@ -1748,7 +2084,7 @@ test('ko.mapping.fromJS should observe specified array but not the children', fu
 		b: [{ b1: "v1" }, { b2: "v2" }] 
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "b" });
+	var result = ko.mapping.fromJS(data, { b: { __options: { observe: true } } });
 	equal(result.a, "a");
 	equal(result.b()[0].b1, "v1");
 	equal(result.b()[1].b2, "v2");
@@ -1760,7 +2096,7 @@ test('ko.mapping.fromJS should observe specified single property, also when goin
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "b" });
+	var result = ko.mapping.fromJS(data, { b: { __options: { observe: true }  } });
 	var js = ko.mapping.toJS(result);
 	equal(js.a, "a");
 	equal(js.b, "b");
@@ -1772,8 +2108,8 @@ test('ko.mapping.fromJS should copy specified single property, also when going b
 		b: "b"
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "b" });
-	var js = ko.mapping.toJS(result, { ignore: "b" });
+	var result = ko.mapping.fromJS(data, { b: { __options: { observe: true } } });
+	var js = ko.mapping.toJS(result, { b: { __options: { ignore: true } } });
 	equal(js.a, "a");
 	equal(js.b, undefined);
 });
@@ -1786,7 +2122,7 @@ test('ko.mapping.fromJS with observe option should not fail when map data with s
 		}
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "a" });
+	var result = ko.mapping.fromJS(data, { a: { __options: { observe: true } } });
 	equal(ko.isObservable(result.a), true);	
 	equal(ko.isObservable(result.b), false);	
 	equal(ko.isObservable(result.b.c), false);	
@@ -1800,7 +2136,7 @@ test('ko.mapping.fromJS should observe property in sub-object', function() {
 		}
 	};
 	
-	var result = ko.mapping.fromJS(data, { observe: "b.c" });
+	var result = ko.mapping.fromJS(data, { b: { c: { __options: { observe: true } } } });
 	equal(ko.isObservable(result.a), false);	
 	equal(ko.isObservable(result.b), false);	
 	equal(ko.isObservable(result.b.c), true);	

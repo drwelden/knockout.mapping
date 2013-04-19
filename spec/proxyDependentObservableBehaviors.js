@@ -21,35 +21,37 @@ var generateProxyTests = function(useComputed) {
 
 			var mapping = {
 				a: {
-					create: function(options) {
-						createOptions = createOptions || {};
-						var mapped = ko.mapping.fromJS(options.data, mapping);
-						
-						var DOdata = function() {
-							test.evaluationCount++;
-							return "test";
-						};
-						if (createOptions.useReadCallback) {
-							mapped.DO = func({
-								read: DOdata,
-								deferEvaluation: !!createOptions.deferEvaluation
-							}, mapped);
-						}
-						else if (createOptions.useWriteCallback) {
-							mapped.DO = func({
-								read: DOdata,
-								write: function(value) { test.written = value; test.writeEvaluationCount++; },
-								deferEvaluation: !!createOptions.deferEvaluation
-							}, mapped);
-						}
-						else {
-							mapped.DO = func(DOdata, mapped, {
-								deferEvaluation: !!createOptions.deferEvaluation
-							});
-						}
-						
-						return mapped;
-					}
+                    __options: {
+                        create: function(options) {
+                            createOptions = createOptions || {};
+                            var mapped = ko.mapping.fromJS(options.data, mapping);
+
+                            var DOdata = function() {
+                                test.evaluationCount++;
+                                return "test";
+                            };
+                            if (createOptions.useReadCallback) {
+                                mapped.DO = func({
+                                    read: DOdata,
+                                    deferEvaluation: !!createOptions.deferEvaluation
+                                }, mapped);
+                            }
+                            else if (createOptions.useWriteCallback) {
+                                mapped.DO = func({
+                                    read: DOdata,
+                                    write: function(value) { test.written = value; test.writeEvaluationCount++; },
+                                    deferEvaluation: !!createOptions.deferEvaluation
+                                }, mapped);
+                            }
+                            else {
+                                mapped.DO = func(DOdata, mapped, {
+                                    deferEvaluation: !!createOptions.deferEvaluation
+                                });
+                            }
+
+                            return mapped;
+                        }
+                    }
 				}
 			};
 			
@@ -67,26 +69,30 @@ var generateProxyTests = function(useComputed) {
 		
 		var result = ko.mapping.fromJS(obj, {
 			a: {
-				create: function(options) {
-					return {
-						a1: ko.observable(options.data.a1),
-						observeB: func(function() {
-							dependencyInvocations.push("a");
-							return options.parent.b.b1();
-						})
-					}
-				}
+                __options: {
+                    create: function(options) {
+                        return {
+                            a1: ko.observable(options.data.a1),
+                            observeB: func(function() {
+                                dependencyInvocations.push("a");
+                                return options.parent.b.b1();
+                            })
+                        }
+                    }
+                }
 			},
 			b: {
-				create: function(options) {
-					return {
-						b1: ko.observable(options.data.b1),
-						observeA: func(function() {
-							dependencyInvocations.push("b");
-							return options.parent.a.a1();
-						})
-					}
-				},
+                __options: {
+                    create: function(options) {
+                        return {
+                            b1: ko.observable(options.data.b1),
+                            observeA: func(function() {
+                                dependencyInvocations.push("b");
+                                return options.parent.a.a1();
+                            })
+                        }
+                    }
+                }
 			}
 		});
 		
@@ -104,36 +110,40 @@ var generateProxyTests = function(useComputed) {
 		
 		var result = ko.mapping.fromJS(obj, {
 			a: {
-				create: function(options) {
-					return {
-						a1: ko.observable(options.data.a1),
-						observeB: func({
-							read: function() {
-								dependencyInvocations.push("a");
-								return options.parent.b.b1();
-							},
-							write: function(value) {
-								options.parent.b.b1(value);
-							}
-						})
-					}
-				}
+                __options: {
+                    create: function(options) {
+                        return {
+                            a1: ko.observable(options.data.a1),
+                            observeB: func({
+                                read: function() {
+                                    dependencyInvocations.push("a");
+                                    return options.parent.b.b1();
+                                },
+                                write: function(value) {
+                                    options.parent.b.b1(value);
+                                }
+                            })
+                        }
+                    }
+                }
 			},
 			b: {
-				create: function(options) {
-					return {
-						b1: ko.observable(options.data.b1),
-						observeA: func({
-							read: function() {
-								dependencyInvocations.push("b");
-								return options.parent.a.a1();
-							},
-							write: function(value) {
-								options.parent.a.a1(value);
-							}
-						})
-					}
-				},
+                __options: {
+                    create: function(options) {
+                        return {
+                            b1: ko.observable(options.data.b1),
+                            observeA: func({
+                                read: function() {
+                                    dependencyInvocations.push("b");
+                                    return options.parent.a.a1();
+                                },
+                                write: function(value) {
+                                    options.parent.a.a1(value);
+                                }
+                            })
+                        }
+                    }
+                }
 			}
 		});
 		
@@ -158,15 +168,17 @@ var generateProxyTests = function(useComputed) {
 		
 		var result = ko.mapping.fromJS(obj, {
 			"items": {
-				create: function(options) {
-					return {
-						id: ko.observable(options.data.id),
-						observeParent: func(function() {
-							dependencyInvocations++;
-							return options.parent.items().length;
-						})
-					}
-				}
+                __options: {
+                    create: function(options) {
+                        return {
+                            id: ko.observable(options.data.id),
+                            observeParent: func(function() {
+                                dependencyInvocations++;
+                                return options.parent.items().length;
+                            })
+                        }
+                    }
+                }
 			}
 		});
 		
@@ -190,14 +202,16 @@ var generateProxyTests = function(useComputed) {
 		var dependency = ko.observable(0);
 		var mapped = ko.mapping.fromJS(obj, {
 			a: {
-				create: function() {
-					var f = func(function() {
-						dependency(dependency() + 1);
-						return dependency();
-					});
-					var ex = f.extend({ throttle: 1 });
-					return ex;
-				}
+                __options: {
+                    create: function() {
+                        var f = func(function() {
+                            dependency(dependency() + 1);
+                            return dependency();
+                        });
+                        var ex = f.extend({ throttle: 1 });
+                        return ex;
+                    }
+                }
 			}
 		});
 		
@@ -291,34 +305,38 @@ var generateProxyTests = function(useComputed) {
 		var DOsubscribedVal ;
 		var mapping = {
 			a: {
-				create: function(options) {
-					var mappedB = ko.mapping.fromJS(options.data, {
-						create: function(options) {
-							//In KO writable computed observables have to be backed by an observable
-							//otherwise they won't be notified they need updating. see: http://jsfiddle.net/drdamour/9Pz4m/ 
-							var DOval = ko.observable(undefined);
-							
-							var m = {};
-							m.myValue = ko.observable("myValue");
-							m.DO = func({
-								read: function() {
-									return DOval();
-								},
-								write: function(val) {
-									DOval(val);
-								}
-							});
-							m.readOnlyDO = func(function() {
-								return m.myValue();
-							});
-							return m;
-						}
-					});
-					mappedB.DO.subscribe(function(val) {
-						DOsubscribedVal = val;
-					});
-					return mappedB;
-				}
+                __options: {
+				    create: function(options) {
+                        var mappedB = ko.mapping.fromJS(options.data, {
+                            __options: {
+                                create: function(options) {
+                                    //In KO writable computed observables have to be backed by an observable
+                                    //otherwise they won't be notified they need updating. see: http://jsfiddle.net/drdamour/9Pz4m/
+                                    var DOval = ko.observable(undefined);
+
+                                    var m = {};
+                                    m.myValue = ko.observable("myValue");
+                                    m.DO = func({
+                                        read: function() {
+                                            return DOval();
+                                        },
+                                        write: function(val) {
+                                            DOval(val);
+                                        }
+                                    });
+                                    m.readOnlyDO = func(function() {
+                                        return m.myValue();
+                                    });
+                                    return m;
+                                }
+                            }
+                        });
+                        mappedB.DO.subscribe(function(val) {
+                            DOsubscribedVal = val;
+                        });
+                        return mappedB;
+                    }
+                }
 			}
 		};
 		
@@ -353,8 +371,10 @@ var generateProxyTests = function(useComputed) {
 		
 		var mapping = {
 			inner: {
-				create: function(options) {
-					return new inner(options.data);
+                __options: {
+				    create: function(options) {
+					    return new inner(options.data);
+                    }
 				}
 			}
 		};
@@ -403,14 +423,18 @@ var generateProxyTests = function(useComputed) {
 
 		var mapping = {
 			a: {
-				create: function(options) {
-					return new MyClassA(options.data, options.parent);
-				}
+                __options: {
+				    create: function(options) {
+					    return new MyClassA(options.data, options.parent);
+    				}
+                }
 			},
 			b: {
-				create: function(options) {
-					return new MyClassB(options.data, options.parent);
-				}
+                __options: {
+				    create: function(options) {
+					    return new MyClassB(options.data, options.parent);
+    				}
+                }
 			}
 		}
 
@@ -440,7 +464,9 @@ var generateProxyTests = function(useComputed) {
 			function()
 			{
 				ko.mapping.fromJS(model, {
-					create:function(){ throw new CustomError("Create Threw");}
+                    __options: {
+					    create:function(){ throw new CustomError("Create Threw");}
+                    }
 				});
 			},
 			CustomError ,
@@ -472,9 +498,11 @@ var generateProxyTests = function(useComputed) {
 		
 		var mapping = {
 			inner: {
-				create: function(options) {
-					return new inner(options.data);
-				}
+                __options: {
+				    create: function(options) {
+					    return new inner(options.data);
+    				}
+                }
 			}
 		};
 		
@@ -500,9 +528,11 @@ var generateProxyTests = function(useComputed) {
 
 			var mapping = {
 				c: {
-					create: function(options) {
-						return new MyClassC(options.data, options.parent, parent); //last param parent here is C's grandparent
-					}
+                    __options: {
+					    create: function(options) {
+						    return new MyClassC(options.data, options.parent, parent); //last param parent here is C's grandparent
+					    }
+                    }
 				}
 			};
 
@@ -539,20 +569,25 @@ var generateProxyTests = function(useComputed) {
 
 		var mapping = {
 			a: {
-				create: function(options) {
-					return new MyClassA(options.data, options.parent);
-				}
+                __options: {
+				    create: function(options) {
+					    return new MyClassA(options.data, options.parent);
+				    }
+                }
 			},
 			b: {
-				create: function(options) {
-					return new MyClassB(options.data, options.parent);
-				}
+                __options: {
+				    create: function(options) {
+					    return new MyClassB(options.data, options.parent);
+    				}
+                }
 			},
 			c: {
-				create: function(options) {
-					return new MyClassC(options.data, options.parent);
-				}
-
+                __options: {
+				    create: function(options) {
+					    return new MyClassC(options.data, options.parent);
+    				}
+                }
 			}
 		}
 
@@ -579,9 +614,11 @@ var generateProxyTests = function(useComputed) {
 		};
 
 		var mapping = {
-			create: function(options) {
-				return new model(options.data);
-			}
+            __options: {
+			    create: function(options) {
+				    return new model(options.data);
+                }
+            }
 		};
 		
 		ko.dependentObservable.fn.myExtension = true;
@@ -607,8 +644,10 @@ var generateProxyTests = function(useComputed) {
 		};
 
 		var mapping = {
-			create: function(options) {
-				return new model(options.data);
+            __options: {
+			    create: function(options) {
+				    return new model(options.data);
+                }
 			}
 		};
 		
@@ -631,12 +670,14 @@ var generateProxyTests = function(useComputed) {
 		
 		var result = ko.mapping.fromJS(obj, {
 			"items": {
-				create: function(options) {
-					if (options.data.id == "b")
-						return options.data;
-					else 
-						return options.skip;
-				}
+                __options: {
+                    create: function(options) {
+                        if (options.data.id == "b")
+                            return options.data;
+                        else
+                            return options.skip;
+                    }
+                }
 			}
 		});
 		
@@ -660,12 +701,14 @@ var generateProxyTests = function(useComputed) {
 		
 		var result = ko.mapping.fromJS(obj, {
 			"items": {
-				create: function(options) {
-					if (options.data.id == "b")
-						return options.skip;
-					else 
-						return options.data;
-				}
+                __options: {
+                    create: function(options) {
+                        if (options.data.id == "b")
+                            return options.skip;
+                        else
+                            return options.data;
+                    }
+                }
 			}
 		});
 		
